@@ -1,23 +1,23 @@
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import { ANIMALS, AnimalKey } from '@/lib/animals';
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { ANIMALS, AnimalKey } from "@/lib/animals";
 
 function spanClasses(col: number, row: number) {
   const colMap: Record<number, string> = {
-    1: 'col-span-1',
-    2: 'col-span-2',
-    3: 'col-span-3',
-    4: 'col-span-4',
-    5: 'col-span-5',
-    6: 'col-span-6',
+    1: "col-span-1",
+    2: "col-span-2",
+    3: "col-span-3",
+    4: "col-span-4",
+    5: "col-span-5",
+    6: "col-span-6",
   };
   const rowMap: Record<number, string> = {
-    1: 'row-span-1',
-    2: 'row-span-2',
-    3: 'row-span-3',
-    4: 'row-span-4',
+    1: "row-span-1",
+    2: "row-span-2",
+    3: "row-span-3",
+    4: "row-span-4",
   };
-  return `${colMap[col] ?? 'col-span-2'} ${rowMap[row] ?? 'row-span-1'}`;
+  return `${colMap[col] ?? "col-span-2"} ${rowMap[row] ?? "row-span-1"}`;
 }
 
 export default async function AnimalPage({

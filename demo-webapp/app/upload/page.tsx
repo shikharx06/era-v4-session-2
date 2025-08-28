@@ -1,35 +1,36 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { Suspense } from "react";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { useState, useEffect } from "react";
 
 function formatBytes(bytes: number): string {
-  if (!bytes) return '0 B';
+  if (!bytes) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
 }
 
-export default function UploadDetailsPage() {
+function UploadDetailsContent() {
   const params = useSearchParams();
-  const imageId = params.get('imageId') || '';
-  const originalName = params.get('originalName') || '';
-  const description = params.get('description') || '';
-  const uploadTime = params.get('uploadTime') || '';
+  const imageId = params.get("imageId") || "";
+  const originalName = params.get("originalName") || "";
+  const description = params.get("description") || "";
+  const uploadTime = params.get("uploadTime") || "";
 
   const [metadata, setMetadata] = useState<any>(null);
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   useEffect(() => {
     // Parse metadata from URL params
-    const metadataStr = params.get('metadata');
+    const metadataStr = params.get("metadata");
     if (metadataStr) {
       try {
         setMetadata(JSON.parse(metadataStr));
       } catch (error) {
-        console.error('Error parsing metadata:', error);
+        console.error("Error parsing metadata:", error);
       }
     }
 
@@ -38,7 +39,7 @@ export default function UploadDetailsPage() {
       // For demo purposes, we'll use a placeholder since we can't easily serve images from FastAPI
       // In a real app, you'd add an endpoint to serve uploaded images
       const apiBaseUrl =
-        process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
       setImageUrl(`${apiBaseUrl}/uploads/${imageId}`);
     }
   }, [params, imageId]);
@@ -70,7 +71,7 @@ export default function UploadDetailsPage() {
               unoptimized
               onError={() => {
                 // Fallback if image can't be loaded
-                setImageUrl('');
+                setImageUrl("");
               }}
             />
           ) : (
@@ -93,22 +94,22 @@ export default function UploadDetailsPage() {
               <span className="text-default-500">Name:</span> {originalName}
             </li>
             <li>
-              <span className="text-default-500">Type:</span>{' '}
-              {metadata.format || 'Unknown'}
+              <span className="text-default-500">Type:</span>{" "}
+              {metadata.format || "Unknown"}
             </li>
             <li>
-              <span className="text-default-500">Size:</span>{' '}
+              <span className="text-default-500">Size:</span>{" "}
               {formatBytes(metadata.file_size || 0)}
             </li>
             <li>
-              <span className="text-default-500">Dimensions:</span>{' '}
+              <span className="text-default-500">Dimensions:</span>{" "}
               {metadata.size
                 ? `${metadata.size.width}x${metadata.size.height}`
-                : 'Unknown'}
+                : "Unknown"}
             </li>
             <li>
-              <span className="text-default-500">Upload Time:</span>{' '}
-              {uploadTime ? new Date(uploadTime).toLocaleString() : '-'}
+              <span className="text-default-500">Upload Time:</span>{" "}
+              {uploadTime ? new Date(uploadTime).toLocaleString() : "-"}
             </li>
           </ul>
         </div>
@@ -116,7 +117,7 @@ export default function UploadDetailsPage() {
         <div className="p-4 rounded-xl border border-default-200 bg-content1">
           <h3 className="font-medium">AI Description</h3>
           <p className="mt-1 text-sm text-default-700">
-            {description || 'No description available'}
+            {description || "No description available"}
           </p>
         </div>
 
@@ -134,7 +135,7 @@ export default function UploadDetailsPage() {
                     .slice(0, 10)
                     .map(([key, value]) => (
                       <li key={key} className="text-xs">
-                        <span className="text-default-500">{key}:</span>{' '}
+                        <span className="text-default-500">{key}:</span>{" "}
                         {String(value).slice(0, 50)}
                       </li>
                     ))}
@@ -145,5 +146,26 @@ export default function UploadDetailsPage() {
         )}
       </aside>
     </section>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <section className="grid place-items-center min-h-[400px]">
+      <div className="text-center">
+        <h1 className="mb-2 text-2xl font-semibold">Loading...</h1>
+        <p className="text-default-600">
+          Please wait while we process your request.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+export default function UploadDetailsPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <UploadDetailsContent />
+    </Suspense>
   );
 }
